@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "05b6a39b-d786-4112-b0c1-cc893b34dbd1",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "C:\\Users\\APP MOVILES\\Documents\\tallerVII11.11.2026\\poliperrosdex\\.archify\\architecture-poliperrosdex-20261111-155200\\candidate.json",
+  "output": "C:\\Users\\APP MOVILES\\Documents\\tallerVII11.11.2026\\poliperrosdex\\.archify\\architecture-poliperrosdex-20261111-155200\\poliperrosdex.html",
+  "specification": {
+    "sha256": "b260219509f3fed51e56d60b9ebb5e7d8829b14be9115f4fb936e1f78b397f3c",
+    "bytes": 7827
+  },
+  "artifact": {
+    "sha256": "ce0de7e9a837daa7bc148715c037c1aee38217764b3e83e1a27927bf685e072d",
+    "bytes": 867040
+  }
+}

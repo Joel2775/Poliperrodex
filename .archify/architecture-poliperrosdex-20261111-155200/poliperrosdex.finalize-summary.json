@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "C:\\Users\\APP MOVILES\\Documents\\tallerVII11.11.2026\\poliperrosdex\\.archify\\architecture-poliperrosdex-20261111-155200\\candidate.json",
+    "sha256": "b260219509f3fed51e56d60b9ebb5e7d8829b14be9115f4fb936e1f78b397f3c",
+    "bytes": 7827
+  },
+  "artifact": {
+    "path": "C:\\Users\\APP MOVILES\\Documents\\tallerVII11.11.2026\\poliperrosdex\\.archify\\architecture-poliperrosdex-20261111-155200\\poliperrosdex.html",
+    "sha256": "ce0de7e9a837daa7bc148715c037c1aee38217764b3e83e1a27927bf685e072d",
+    "bytes": 867040
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "C:\\Users\\APP MOVILES\\Documents\\tallerVII11.11.2026\\poliperrosdex\\.archify\\architecture-poliperrosdex-20261111-155200\\poliperrosdex.finalize.json",
+    "summaryReceipt": "C:\\Users\\APP MOVILES\\Documents\\tallerVII11.11.2026\\poliperrosdex\\.archify\\architecture-poliperrosdex-20261111-155200\\poliperrosdex.finalize-summary.json",
+    "browserCheckReceipt": "C:\\Users\\APP MOVILES\\Documents\\tallerVII11.11.2026\\poliperrosdex\\.archify\\architecture-poliperrosdex-20261111-155200\\poliperrosdex.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-11T20:55:24.394Z",
+    "source": "network",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 5584,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

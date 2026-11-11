@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Arquitectura del Sistema - Poliperrosdex",
+    "locale": "es",
+    "output": ".archify/architecture-poliperrosdex-20261111-155200/poliperrosdex.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    {
+      "id": "usuario",
+      "type": "external",
+      "label": "Entrenador",
+      "sublabel": "Usuario móvil",
+      "icon": "person",
+      "pos": [40, 190],
+      "size": [100, 64]
+    },
+    {
+      "id": "app_router",
+      "type": "frontend",
+      "label": "Expo Router",
+      "sublabel": "Stack & Tab Layouts",
+      "icon": "frontend",
+      "tag": "src/app",
+      "pos": [250, 50],
+      "size": [140, 60]
+    },
+    {
+      "id": "ui_screens",
+      "type": "frontend",
+      "label": "Pantallas UI",
+      "sublabel": "Pokédex, Captura, Mapa",
+      "icon": "frontend",
+      "tag": "React Native",
+      "pos": [250, 190],
+      "size": [140, 64]
+    },
+    {
+      "id": "apodo_ctx",
+      "type": "frontend",
+      "label": "ApodoContext",
+      "sublabel": "Estado global apodo",
+      "icon": "frontend",
+      "tag": "React Context",
+      "pos": [250, 330],
+      "size": [140, 60]
+    },
+    {
+      "id": "mvvm_viewmodels",
+      "type": "frontend",
+      "label": "Capa ViewModels",
+      "sublabel": "useCaptura, usePokedex, useMapa",
+      "icon": "frontend",
+      "tag": "MVVM Logic",
+      "pos": [500, 190],
+      "size": [150, 64]
+    },
+    {
+      "id": "repo_perros",
+      "type": "backend",
+      "label": "PerrosRepository",
+      "sublabel": "Catálogo y mapeo Perro",
+      "icon": "backend",
+      "tag": "src/data",
+      "pos": [730, 50],
+      "size": [150, 60]
+    },
+    {
+      "id": "repo_avistamientos",
+      "type": "backend",
+      "label": "AvistamientosRepo",
+      "sublabel": "Upload foto + insert BD",
+      "icon": "backend",
+      "tag": "Transacción 2 pasos",
+      "pos": [730, 190],
+      "size": [150, 64]
+    },
+    {
+      "id": "servicios_sensores",
+      "type": "backend",
+      "label": "Servicios Sensores",
+      "sublabel": "Acelerómetro y GPS location",
+      "icon": "backend",
+      "tag": "Sensores",
+      "pos": [730, 330],
+      "size": [150, 60]
+    },
+    {
+      "id": "repo_entrenador",
+      "type": "backend",
+      "label": "EntrenadorRepo",
+      "sublabel": "Persistencia apodo en FS",
+      "icon": "backend",
+      "tag": "expo-file-system",
+      "pos": [730, 460],
+      "size": [150, 60]
+    },
+    {
+      "id": "servicio_supabase",
+      "type": "backend",
+      "label": "SupabaseService",
+      "sublabel": "PostgREST & Storage API",
+      "icon": "backend",
+      "tag": "@supabase/js",
+      "pos": [960, 120],
+      "size": [150, 64]
+    },
+    {
+      "id": "expo_native_apis",
+      "type": "backend",
+      "label": "Expo Native APIs",
+      "sublabel": "Camera, Sensors, Location, FS",
+      "icon": "backend",
+      "tag": "Expo Runtime",
+      "pos": [960, 395],
+      "size": [150, 64]
+    },
+    {
+      "id": "supabase_db",
+      "type": "database",
+      "label": "PostgreSQL DB",
+      "sublabel": "Tablas perros y avistamientos",
+      "icon": "database",
+      "tag": "Supabase Cloud",
+      "pos": [1190, 50],
+      "size": [140, 60]
+    },
+    {
+      "id": "supabase_storage",
+      "type": "cloud",
+      "label": "Supabase Storage",
+      "sublabel": "Bucket fotos capturas",
+      "icon": "cloud",
+      "tag": "Storage CDN",
+      "pos": [1190, 190],
+      "size": [140, 60]
+    },
+    {
+      "id": "osm_tiles",
+      "type": "cloud",
+      "label": "OpenStreetMap",
+      "sublabel": "Teselas OSM & Leaflet CDN",
+      "icon": "cloud",
+      "tag": "Cartografía Web",
+      "pos": [1190, 395],
+      "size": [140, 64]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Aplicación Móvil Poliperrosdex (Expo Runtime)",
+      "wraps": [
+        "app_router",
+        "ui_screens",
+        "apodo_ctx",
+        "mvvm_viewmodels",
+        "repo_perros",
+        "repo_avistamientos",
+        "servicios_sensores",
+        "repo_entrenador",
+        "servicio_supabase",
+        "expo_native_apis"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Supabase BaaS (Cloud Platform)",
+      "wraps": [
+        "supabase_db",
+        "supabase_storage"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn-usuario-ui",
+      "from": "usuario",
+      "to": "ui_screens",
+      "label": "Interacción",
+      "variant": "emphasis"
+    },
+    {
+      "id": "conn-router-ui",
+      "from": "app_router",
+      "to": "ui_screens",
+      "label": "Navegación",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "conn-apodo-ui",
+      "from": "apodo_ctx",
+      "to": "ui_screens",
+      "label": "Provee apodo",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "conn-ui-vm",
+      "from": "ui_screens",
+      "to": "mvvm_viewmodels",
+      "label": "Enlace MVVM",
+      "variant": "emphasis"
+    },
+    {
+      "id": "conn-vm-perros",
+      "from": "mvvm_viewmodels",
+      "to": "repo_perros",
+      "label": "Consultar"
+    },
+    {
+      "id": "conn-vm-avistamientos",
+      "from": "mvvm_viewmodels",
+      "to": "repo_avistamientos",
+      "label": "Registrar",
+      "variant": "emphasis"
+    },
+    {
+      "id": "conn-vm-sensores",
+      "from": "mvvm_viewmodels",
+      "to": "servicios_sensores",
+      "label": "GPS y caída"
+    },
+    {
+      "id": "conn-apodo-repo",
+      "from": "apodo_ctx",
+      "to": "repo_entrenador",
+      "label": "Persiste apodo",
+      "fromSide": "bottom",
+      "toSide": "left"
+    },
+    {
+      "id": "conn-perros-supabase",
+      "from": "repo_perros",
+      "to": "servicio_supabase",
+      "label": "Query perros"
+    },
+    {
+      "id": "conn-avistamientos-supabase",
+      "from": "repo_avistamientos",
+      "to": "servicio_supabase",
+      "label": "Subida y SQL"
+    },
+    {
+      "id": "conn-sensores-hardware",
+      "from": "servicios_sensores",
+      "to": "expo_native_apis",
+      "label": "Lecturas"
+    },
+    {
+      "id": "conn-entrenador-hardware",
+      "from": "repo_entrenador",
+      "to": "expo_native_apis",
+      "label": "I/O apodo.txt"
+    },
+    {
+      "id": "conn-supabase-db",
+      "from": "servicio_supabase",
+      "to": "supabase_db",
+      "label": "PostgREST",
+      "variant": "emphasis"
+    },
+    {
+      "id": "conn-supabase-storage",
+      "from": "servicio_supabase",
+      "to": "supabase_storage",
+      "label": "Storage API",
+      "variant": "dashed"
+    },
+    {
+      "id": "conn-hardware-osm",
+      "from": "expo_native_apis",
+      "to": "osm_tiles",
+      "label": "Tiles OSM"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Patrón MVVM & UI",
+      "items": [
+        "Vistas desacopladas mediante hooks ViewModel (useCaptura, usePokedex, useMapa)",
+        "ApodoContext provee identidad reactiva del entrenador a nivel de árbol React",
+        "Renderizado de mapa interactivo Leaflet / OSM mediante WebView aislado"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Flujo de Captura & Sensores",
+      "items": [
+        "Acelerómetro detecta caída libre (<0.35g) e impacto (>2.2g) simulando lanzamiento",
+        "AbortController cancela la transacción en curso si el dispositivo se cae",
+        "Ubicación GPS precisa obtenida vía expo-location para geolocalizar el avistamiento"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Capa de Datos & Supabase",
+      "items": [
+        "AvistamientosRepository ejecuta operación en 2 fases: Storage y base de datos",
+        "PerrosRepository transforma filas de Postgres a modelos puros de dominio",
+        "EntrenadorRepository almacena el apodo localmente en apodo.txt vía expo-file-system"
+      ]
+    }
+  ]
+}
