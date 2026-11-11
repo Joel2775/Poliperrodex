@@ -1,29 +1,17 @@
 import { router } from 'expo-router';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
  
-import { useApodo } from '@/ui/core/apodo-view-model';
+import { useEntrenador } from '@/ui/core/entrenador-view-model';
 import { Estado } from '@/ui/core/estado';
-import { FormularioApodo } from '@/ui/core/formulario-apodo';
 import { colores, espacio } from '@/ui/core/tema';
 import { Texto } from '@/ui/core/texto';
  
 import { TarjetaPerro } from './tarjeta-perro';
 import { usePokedexViewModel } from './use-pokedex-view-model';
  
-// La pantalla se parte en dos porque un hook no puede llamarse de forma
-// condicional: primero vemos si hay apodo y solo entonces creamos el
-// ViewModel, que necesita ese apodo para consultar.
 export function PokedexScreen() {
-  const { apodo, listo } = useApodo();
- 
-  if (!listo) return <Estado cargando />;
-  if (!apodo) return <FormularioApodo />;
-  return <ListaPokedex apodo={apodo} />;
-}
- 
-function ListaPokedex({ apodo }: { apodo: string }) {
-  const { olvidarApodo } = useApodo();
-  const vm = usePokedexViewModel(apodo);
+  const { entrenador, cerrarSesion, error } = useEntrenador();
+  const vm = usePokedexViewModel(entrenador?.id ?? '');
  
   if (vm.cargando || (vm.error && vm.perros.length === 0)) {
     return (
@@ -39,11 +27,12 @@ function ListaPokedex({ apodo }: { apodo: string }) {
       ItemSeparatorComponent={() => <View style={{ height: espacio.s }} />}
       ListHeaderComponent={
         <View style={estilos.cabecera}>
-          <Texto variante="nota">Entrenador: {apodo}</Texto>
+          <Texto variante="nota">Entrenador: {entrenador?.nombre}</Texto>
           <Texto variante="subtitulo">{vm.resumen}</Texto>
-          <Pressable onPress={olvidarApodo} hitSlop={8}>
+          {error && <Texto style={{ color: colores.alerta }}>{error}</Texto>}
+          <Pressable onPress={cerrarSesion} hitSlop={8}>
             <Texto variante="nota" style={estilos.enlace}>
-              Cambiar apodo
+              Cerrar sesión
             </Texto>
           </Pressable>
         </View>

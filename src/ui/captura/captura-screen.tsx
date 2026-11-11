@@ -1,12 +1,12 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import { Image } from 'expo-image';
 import { router, useIsFocused } from 'expo-router';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
  
-import { useApodo } from '@/ui/core/apodo-view-model';
+import { useEntrenador } from '@/ui/core/entrenador-view-model';
 import { Boton } from '@/ui/core/boton';
 import { Estado } from '@/ui/core/estado';
-import { FormularioApodo } from '@/ui/core/formulario-apodo';
 import { colores, espacio, fuentes, radio } from '@/ui/core/tema';
 import { Texto } from '@/ui/core/texto';
  
@@ -15,40 +15,42 @@ import { useCapturaViewModel, type PasoCaptura } from './use-captura-view-model'
 const TEXTO_PASO: Record<PasoCaptura, string> = {
   listo: 'Capturar',
   fotografiando: 'Fotografiando…',
+  validando: 'Validando la foto…',
   ubicando: 'Buscando tu ubicación…',
   guardando: 'Guardando…',
 };
  
 export function CapturaScreen() {
-  const { apodo, listo } = useApodo();
+  const { entrenador } = useEntrenador();
  
-  if (!listo) return <Estado cargando />;
-  // Sin apodo no hay a nombre de quién guardar la captura.
-  if (!apodo) return <FormularioApodo />;
-  return <Camara apodo={apodo} />;
+  if (!entrenador) return <Estado cargando />;
+  return <Camara apodo={entrenador.apodo} entrenadorId={entrenador.id} />;
 }
  
 // La vista solo dibuja lo que el ViewModel le entrega y le avisa de los
 // toques. Las únicas decisiones que toma son de interfaz: el permiso de
 // la cámara y a qué pantalla ir cuando la captura termina bien.
-function Camara({ apodo }: { apodo: string }) {
+function Camara({ apodo, entrenadorId }: { apodo: string; entrenadorId: string }) {
   const camara = useRef<CameraView>(null);
   const [permiso, pedirPermiso] = useCameraPermissions();
+  const [fotoPreview, setFotoPreview] = useState<string | null>(null);
  
   // Las pestañas siguen montadas aunque no se vean. Con esto, la cámara y
   // el acelerómetro se apagan cuando estás en otra pestaña.
   const enPantalla = useIsFocused();
-  const vm = useCapturaViewModel({ apodo, activo: enPantalla });
+  const vm = useCapturaViewModel({ apodo, entrenadorId, activo: enPantalla });
  
   async function alCapturar() {
-    const guardado = await vm.capturar(async () => {
-      const foto = await camara.current?.takePictureAsync({
-        quality: 0.6,
-        shutterSound: false,
-      });
-      return foto?.uri;
+    const foto = await camara.current?.takePictureAsync({
+      quality: 0.6,
+      shutterSound: false,
     });
+    const fotoUri = foto?.uri ?? null;
+    setFotoPreview(fotoUri);
+
+    const guardado = await vm.capturar(async () => fotoUri ?? undefined);
     if (guardado && vm.perroId) {
+      setFotoPreview(null);
       router.push({ pathname: '/perro/[id]', params: { id: vm.perroId } });
     }
   }
@@ -93,7 +95,7 @@ function Camara({ apodo }: { apodo: string }) {
       </View>
  
       <View style={estilos.abajo}>
-        {vm.error && <Texto style={estilos.error}>{vm.error}</Texto>}
+        {vm.error && !fotoPreview && <Texto style={estilos.error}>{vm.error}</Texto>}
         <Boton
           titulo={vm.perroId ? TEXTO_PASO[vm.paso] : 'Elige un perro primero'}
           onPress={alCapturar}
@@ -101,6 +103,28 @@ function Camara({ apodo }: { apodo: string }) {
         />
       </View>
  
+      {(fotoPreview && (vm.paso === 'validando' || vm.error)) && (
+        <View style={estilos.fondoPreview}>
+          <View style={estilos.previewCaja}>
+            <Image source={{ uri: fotoPreview }} style={estilos.previewImagen} />
+            <Texto style={estilos.previewTitulo}>
+              {vm.paso === 'validando' ? 'Comprobando la calidad de la foto…' : 'La foto necesita otro intento'}
+            </Texto>
+            {vm.error && <Texto style={estilos.previewError}>{vm.error}</Texto>}
+            {vm.error && (
+              <Boton
+                titulo="Tomar otra foto"
+                onPress={() => {
+                  setFotoPreview(null);
+                  vm.limpiarError();
+                }}
+                variante="secundario"
+              />
+            )}
+          </View>
+        </View>
+      )}
+
       {/* Tapa el botón mientras está visible: no se puede disparar otra
           foto hasta que el usuario confirme que recogió el teléfono. */}
       {vm.seCayo && (
@@ -134,6 +158,34 @@ const estilos = StyleSheet.create({
   chipTexto: { color: colores.blanco, fontWeight: '600' },
   abajo: { marginTop: 'auto', padding: espacio.m, gap: espacio.s },
   error: { color: colores.blanco, backgroundColor: colores.alerta, padding: espacio.s },
+  fondoPreview: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(42, 37, 32, 0.82)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: espacio.l,
+  },
+  previewCaja: {
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: colores.papel,
+    borderRadius: radio,
+    padding: espacio.m,
+    gap: espacio.s,
+    alignItems: 'center',
+  },
+  previewImagen: {
+    width: '100%',
+    height: 220,
+    borderRadius: radio,
+    backgroundColor: colores.tinta,
+  },
+  previewTitulo: {
+    fontWeight: '700',
+    color: colores.tinta,
+    textAlign: 'center',
+  },
+  previewError: { color: colores.alerta, textAlign: 'center' },
   fondoAviso: {
     ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(42, 37, 32, 0.82)',

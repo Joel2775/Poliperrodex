@@ -1,11 +1,28 @@
 import { createClient } from '@supabase/supabase-js';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
  
 import { env } from './env';
  
+const almacenamientoAuth =
+  Platform.OS === 'web'
+    ? undefined
+    : {
+        getItem: SecureStore.getItemAsync,
+        setItem: SecureStore.setItemAsync,
+        removeItem: SecureStore.deleteItemAsync,
+      };
+
 // Service: envuelve una fuente de datos externa y nada más.
 // No guarda estado ni transforma datos; eso le toca al repositorio.
 export const supabase = createClient(env.supabaseUrl, env.supabaseKey, {
-  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  auth: {
+    flowType: 'pkce',
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: false,
+    storage: almacenamientoAuth,
+  },
 });
  
 export function urlPublica(ruta: string): string {

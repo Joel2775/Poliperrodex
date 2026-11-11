@@ -3,6 +3,9 @@ import { Tabs } from 'expo-router/js-tabs';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
  
+import { useEntrenador } from '@/ui/core/entrenador-view-model';
+import { Estado } from '@/ui/core/estado';
+import { InicioSesion } from '@/ui/core/inicio-sesion';
 import { colores, fuentes } from '@/ui/core/tema';
  
 type NombreIcono = ComponentProps<typeof MaterialCommunityIcons>['name'];
@@ -15,6 +18,11 @@ function IconoPestana(props: { nombre: NombreIcono; color: ColorValue; size: num
 }
  
 export default function TabsLayout() {
+  const { entrenador, listo } = useEntrenador();
+
+  if (!listo) return <Estado cargando />;
+  if (!entrenador) return <InicioSesion />;
+
   return (
     <Tabs
       screenOptions={{

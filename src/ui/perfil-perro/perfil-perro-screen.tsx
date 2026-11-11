@@ -2,9 +2,10 @@ import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
  
-import { useApodo } from '@/ui/core/apodo-view-model';
+import { useEntrenador } from '@/ui/core/entrenador-view-model';
 import { Estado } from '@/ui/core/estado';
 import { formatearNumero } from '@/ui/core/formato';
+import { InicioSesion } from '@/ui/core/inicio-sesion';
 import { colores, espacio } from '@/ui/core/tema';
 import { Texto } from '@/ui/core/texto';
  
@@ -15,8 +16,15 @@ export function PerfilPerroScreen() {
   // Leer el id de la URL es trabajo de la vista: el ViewModel recibe
   // el dato ya resuelto y no sabe nada de rutas.
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { apodo } = useApodo();
-  const vm = usePerfilPerroViewModel(id, apodo);
+  const { entrenador, listo } = useEntrenador();
+
+  if (!listo) return <Estado cargando />;
+  if (!entrenador) return <InicioSesion />;
+  return <PerfilAutenticado id={id} entrenadorId={entrenador.id} />;
+}
+
+function PerfilAutenticado({ id, entrenadorId }: { id: string; entrenadorId: string }) {
+  const vm = usePerfilPerroViewModel(id, entrenadorId);
  
   if (!vm.perro) {
     return (

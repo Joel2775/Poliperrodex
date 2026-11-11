@@ -44,7 +44,8 @@
         {
           "locationWhenInUsePermission": "Poliperrodex guarda dónde viste a cada perro para mostrarlo en el mapa."
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

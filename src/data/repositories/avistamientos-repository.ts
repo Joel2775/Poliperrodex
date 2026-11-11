@@ -7,6 +7,7 @@ import { subirImagen, supabase, urlPublica } from '../services/supabase-service'
 type FilaAvistamiento = {
   id: string;
   perro_id: string;
+  entrenador_id: string | null;
   apodo: string;
   foto_path: string;
   latitud: number;
@@ -16,12 +17,13 @@ type FilaAvistamiento = {
 };
  
 const COLUMNAS =
-  'id, perro_id, apodo, foto_path, latitud, longitud, creado_en, perro:perros(nombre)';
+  'id, perro_id, entrenador_id, apodo, foto_path, latitud, longitud, creado_en, perro:perros(nombre)';
  
 function aDominio(fila: FilaAvistamiento): Avistamiento {
   return {
     id: fila.id,
     perroId: fila.perro_id,
+    entrenadorId: fila.entrenador_id,
     nombrePerro: fila.perro?.nombre ?? 'Perro desconocido',
     apodo: fila.apodo,
     fotoUrl: urlPublica(fila.foto_path),
@@ -39,6 +41,7 @@ function cortarSiSeCancelo(signal?: AbortSignal) {
  
 type NuevaCaptura = {
   perroId: string;
+  entrenadorId: string;
   apodo: string;
   fotoUri: string;
   latitud: number;
@@ -59,11 +62,11 @@ export const avistamientosRepository = {
     return (data as unknown as FilaAvistamiento[]).map(aDominio);
   },
  
-  async perrosCapturadosPor(apodo: string): Promise<Set<string>> {
+  async perrosCapturadosPor(entrenadorId: string): Promise<Set<string>> {
     const { data, error } = await supabase
       .from('avistamientos')
       .select('perro_id')
-      .eq('apodo', apodo);
+      .eq('entrenador_id', entrenadorId);
     if (error) throw new Error(`No se pudo revisar tus capturas: ${error.message}`);
     return new Set(data.map((fila) => fila.perro_id as string));
   },
@@ -85,6 +88,7 @@ export const avistamientosRepository = {
  
     let insercion = supabase.from('avistamientos').insert({
       perro_id: captura.perroId,
+      entrenador_id: captura.entrenadorId,
       apodo: captura.apodo,
       foto_path: ruta,
       latitud: captura.latitud,

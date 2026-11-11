@@ -3,18 +3,20 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { avistamientosRepository } from '@/data/repositories/avistamientos-repository';
 import { perrosRepository } from '@/data/repositories/perros-repository';
 import { escucharCaidas } from '@/data/services/acelerometro-service';
+import { evaluarCalidadImagen } from '@/data/services/image-quality-service';
 import { obtenerUbicacionActual } from '@/data/services/ubicacion-service';
 import type { Perro } from '@/domain/models/perro';
  
-export type PasoCaptura = 'listo' | 'fotografiando' | 'ubicando' | 'guardando';
+export type PasoCaptura = 'listo' | 'fotografiando' | 'validando' | 'ubicando' | 'guardando';
  
 type Parametros = {
   apodo: string;
+  entrenadorId: string;
   // Solo escuchamos el acelerómetro mientras la pantalla está a la vista.
   activo: boolean;
 };
  
-export function useCapturaViewModel({ apodo, activo }: Parametros) {
+export function useCapturaViewModel({ apodo, entrenadorId, activo }: Parametros) {
   const [perros, setPerros] = useState<Perro[]>([]);
   const [perroId, setPerroId] = useState<string | null>(null);
   const [paso, setPaso] = useState<PasoCaptura>('listo');
@@ -60,13 +62,22 @@ export function useCapturaViewModel({ apodo, activo }: Parametros) {
         if (!fotoUri) throw new Error('La cámara no devolvió ninguna foto');
         if (controlador.signal.aborted) return false;
  
+        setPaso('validando');
+        const resultado = await evaluarCalidadImagen(fotoUri);
+        if (!resultado.isValid) {
+          const detalle = resultado.issues[0] ?? 'La fotografía presenta problemas de calidad.';
+          setError(detalle);
+          return false;
+        }
+        if (controlador.signal.aborted) return false;
+
         setPaso('ubicando');
         const { latitud, longitud } = await obtenerUbicacionActual();
         if (controlador.signal.aborted) return false;
  
         setPaso('guardando');
         await avistamientosRepository.registrarCaptura(
-          { perroId, apodo, fotoUri, latitud, longitud },
+          { perroId, apodo, entrenadorId, fotoUri, latitud, longitud },
           controlador.signal,
         );
         return true;
@@ -81,7 +92,7 @@ export function useCapturaViewModel({ apodo, activo }: Parametros) {
         setPaso('listo');
       }
     },
-    [perroId, apodo],
+    [perroId, apodo, entrenadorId],
   );
  
   return {
@@ -93,6 +104,7 @@ export function useCapturaViewModel({ apodo, activo }: Parametros) {
     puedeCapturar: perroId !== null && paso === 'listo' && !seCayo,
     seleccionarPerro: setPerroId,
     capturar,
+    limpiarError: () => setError(null),
     cerrarAvisoCaida: () => setSeCayo(false),
   };
 }
